@@ -4,6 +4,7 @@ import { getBuildingList, getFilterList } from '../apis/api';
 import { fetchBuildingsApis, fetchFiltersApis } from '../redux/actions/buildingAction';
 import Filters from '../components/Filters'
 import Navbar from '../components/Navbar';
+import { Link } from 'react-router-dom';
 const Buildings = () => {
     const dispatch = useDispatch();
     const { data: allBuildings } = useSelector(state => state.buildings);
@@ -25,7 +26,7 @@ const Buildings = () => {
 
 
     const filterData = () => {
-         let filterBuilding = [];
+        let filterBuilding = [];
         let buidlings = allBuildings;
         const selectedFloors = floorFilters.filter(x => x.isChecked).map(item => item.filter);
         const selectedBedrooms = bedRoomFilter.filter(x => x.isChecked).map(item => item.filter);
@@ -36,41 +37,40 @@ const Buildings = () => {
             let x = element.floor.split('.')[0];
             if (selectedFloors.includes(x)) {
                 filterBuilding.push(element);
-            }            
+            }
         });
         buidlings.forEach(element => {
             let x = element.bedroom.split('+')[0];
             if (selectedBedrooms.includes(x)) {
                 filterBuilding.push(element);
-            }            
-        });        
-        buidlings.forEach(element=>{
+            }
+        });
+        buidlings.forEach(element => {
             let x = Number(element.price);
-            selectedPrices.forEach(item=>{
+            selectedPrices.forEach(item => {
                 let amts = item.split('-')
                 let fromAmt = Number(amts[0]);
                 let toAmt = Number(amts[1]);
-                if(x>=fromAmt && x<=toAmt)
-                {
+                if (x >= fromAmt && x <= toAmt) {
                     filterBuilding.push(element);
                 }
             })
-        })       
-        buidlings.forEach(element=>{
+        })
+        buidlings.forEach(element => {
             let x = Number(element.grossm2);
-            selectedGrooms.forEach(item=>{                
+            selectedGrooms.forEach(item => {
                 let groom = item.split('-')
                 let fromGroom = Number(groom[0]);
                 let toGroom = Number(groom[1]);
-                if(x>=fromGroom && x<=toGroom)
-                {
+                if (x >= fromGroom && x <= toGroom) {
                     filterBuilding.push(element);
                 }
             })
-        })      
-
-        const uniqueArr = filterBuilding.filter((v, i, a) => a.findIndex(t => (t.uniqueID === v.uniqueID)) === i);
-        setBuildings(uniqueArr);        
+        })
+        if (selectedBedrooms.length > 0 || selectedFloors.length > 0 || selectedPrices.length > 0 || selectedGrooms.length > 0) {
+            const uniqueArr = filterBuilding.filter((v, i, a) => a.findIndex(t => (t.uniqueID === v.uniqueID)) === i);
+            setBuildings(uniqueArr);
+        }
     }
 
     const getBuildings = () => {
@@ -120,6 +120,7 @@ const Buildings = () => {
         }
     }
 
+
     return (
         <div className="container">
             <Navbar />
@@ -143,18 +144,23 @@ const Buildings = () => {
                     <div className="row mt-5">
                         {
                             buildings && buildings.map((item) => (
+
                                 <div className="col-sm-4" key={item.uniqueID}>
                                     <div className="card my-2">
                                         <div className="card-body">
                                             <h5 className="card-title">
-                                                <p className="card-text"> {item.bedroom}</p>
-                                                <p className="card-text"> {item.price}</p>
-                                                <p className="card-text"> {item.floor}</p>
-                                                <p className="card-text"> {item.grossm2}</p>
+                                                <p className="card-text">Bedrooms -  {item.bedroom}</p>
+                                                <p className="card-text"> price -  {item.price}</p>
+                                                <p className="card-text">floor - {item.floor}</p>
+                                                <p className="card-text">groom -  {item.grossm2}</p>
+                                                <Link to={`/buiding/${item.uniqueID}/details`}>
+                                                    <button>View</button>
+                                                </Link>
                                             </h5>
                                         </div>
                                     </div>
                                 </div>
+
                             ))
                         }
                     </div>
